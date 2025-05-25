@@ -1,0 +1,8 @@
+- [ ] Directory walking and file collection
+- [ ] Archive writing functionality  
+- [ ] Build script implementation
+- [ ] Runtime archive parsing and file extraction
+- [ ] Public API design
+- [ ] Documentation and examples
+- [ ] Performance optimization
+- [ ] Comprehensive testing
