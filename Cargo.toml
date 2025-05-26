@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/happenslol/include-fs"
+description = "Embed folders in your binary"
+readme = "README.md"
+authors = ["Hilmar Wiegand <me@hwgnd.de>"]
+categories = ["development-tools", "web-programming", "game-engines"]
+keywords = ["assets", "include", "embed", "dir"]
 
 [dependencies]
 thiserror = "2.0.12"
