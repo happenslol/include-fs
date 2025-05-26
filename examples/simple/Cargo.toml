@@ -1,0 +1,10 @@
+[package]
+name = "simple"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+include-fs.workspace = true
+
+[build-dependencies]
+include-fs.workspace = true

@@ -5,3 +5,10 @@ edition = "2024"
 
 [dependencies]
 thiserror = "2.0.12"
+walkdir = "2.5.0"
+
+[workspace]
+members = ["examples/*"]
+
+[workspace.dependencies]
+include-fs = { version = "0.1.0", path = "." }
