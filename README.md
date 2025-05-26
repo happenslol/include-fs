@@ -23,6 +23,12 @@ fn main() {
 }
 ```
 
+## Planned Features
+
+- Improved API with better error messages
+- Feature-flagged glob support
+- Directory listing
+
 ## Archive Format
 
 The archive uses a simple binary format:
