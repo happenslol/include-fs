@@ -1,3 +1,3 @@
 fn main() {
-  include_fs::embed_fs("src", "source").expect("embed source dir");
+  include_fs::bundle("src", "source").expect("embed source dir");
 }

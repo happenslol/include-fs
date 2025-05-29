@@ -6,8 +6,19 @@ version = 4
 name = "include-fs"
 version = "0.1.0"
 dependencies = [
+ "macros",
  "thiserror",
  "walkdir",
+]
+
+[[package]]
+name = "macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "thiserror",
 ]
 
 [[package]]

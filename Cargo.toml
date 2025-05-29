@@ -11,11 +11,14 @@ categories = ["development-tools", "web-programming", "game-engines"]
 keywords = ["assets", "include", "embed", "dir"]
 
 [dependencies]
-thiserror = "2.0.12"
+thiserror.workspace = true
 walkdir = "2.5.0"
+macros = { path = "./macros" }
 
 [workspace]
-members = ["examples/*"]
+resolver = "3"
+members = ["examples/*", "macros"]
 
 [workspace.dependencies]
+thiserror = "2.0.12"
 include-fs = { version = "0.1.0", path = "." }

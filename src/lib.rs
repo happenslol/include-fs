@@ -7,6 +7,8 @@ use std::sync::LazyLock;
 use thiserror::Error;
 use walkdir::WalkDir;
 
+pub use macros::include_fs;
+
 const MAGIC: &[u8; 4] = b"INFS";
 
 #[derive(Error, Debug)]
@@ -118,9 +120,9 @@ fn write_archive(files: &[FileEntry], output_path: &Path) -> Result<(), ArchiveE
   Ok(())
 }
 
-pub fn embed_fs(source_dir: &str, name: &str) -> Result<(), ArchiveError> {
+pub fn bundle<P: AsRef<Path>>(dir: P, bundle_name: &str) -> Result<(), ArchiveError> {
   let manifest_dir = env::var("CARGO_MANIFEST_DIR").expect("no CARGO_MANIFEST_DIR");
-  let source_dir = Path::new(&manifest_dir).join(source_dir).canonicalize()?;
+  let source_dir = Path::new(&manifest_dir).join(dir).canonicalize()?;
 
   // Ensure the source directory is a subdirectory of the manifest directory
   if !source_dir.starts_with(&manifest_dir) {
@@ -144,7 +146,7 @@ pub fn embed_fs(source_dir: &str, name: &str) -> Result<(), ArchiveError> {
   }
 
   let out_dir = env::var("OUT_DIR").expect("no OUT_DIR");
-  let output_file = format!("{}.embed_fs", name);
+  let output_file = format!("{}.embed_fs", bundle_name);
   let output_path = Path::new(&out_dir).join(output_file);
 
   write_archive(&files, &output_path)
@@ -170,11 +172,11 @@ pub type IncludeFs = LazyLock<IncludeFsInner>;
 
 pub struct IncludeFsInner {
   pub file_index: HashMap<String, FsEntry>,
-  pub archive_bytes: Vec<u8>,
+  pub archive_bytes: &'static [u8],
 }
 
 impl IncludeFsInner {
-  pub fn new(archive_bytes: &[u8]) -> Result<Self, FsError> {
+  pub fn new(archive_bytes: &'static [u8]) -> Result<Self, FsError> {
     if &archive_bytes[0..4] != MAGIC {
       return Err(FsError::InvalidArchive);
     }
@@ -224,9 +226,9 @@ impl IncludeFsInner {
       file_index.insert(path.clone(), FsEntry::new(path, size, data_offset));
     }
 
-    Ok(Self {
+    Ok(IncludeFsInner {
       file_index,
-      archive_bytes: archive_bytes.to_vec(),
+      archive_bytes,
     })
   }
 
@@ -247,16 +249,6 @@ impl IncludeFsInner {
   pub fn list_paths(&self) -> Vec<&str> {
     self.file_index.keys().map(|s| s.as_str()).collect()
   }
-}
-
-#[macro_export]
-macro_rules! include_fs {
-  ($name:expr) => {
-    ::std::sync::LazyLock::new(|| {
-      let archive_bytes = include_bytes!(concat!(env!("OUT_DIR"), "/", $name, ".embed_fs"));
-      ::include_fs::IncludeFsInner::new(archive_bytes).expect("Failed to initialize IncludeFs")
-    })
-  };
 }
 
 #[cfg(test)]
