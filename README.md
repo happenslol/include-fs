@@ -25,8 +25,8 @@ fn main() {
 
 ## Planned Features
 
-- Improved API with better error messages
-- Feature-flagged glob support
+- glob support
+- compile-time mime-type detection
 - Directory listing
 
 ## Archive Format

@@ -1,6 +1,6 @@
 [package]
 name = "include-fs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/happenslol/include-fs"
@@ -11,7 +11,7 @@ categories = ["development-tools", "web-programming", "game-engines"]
 keywords = ["assets", "include", "embed", "dir"]
 
 [dependencies]
-thiserror.workspace = true
+thiserror = "2.0.12"
 walkdir = "2.5.0"
 macros = { path = "./macros" }
 
@@ -20,5 +20,4 @@ resolver = "3"
 members = ["examples/*", "macros"]
 
 [workspace.dependencies]
-thiserror = "2.0.12"
-include-fs = { version = "0.1.0", path = "." }
+include-fs = { version = "0.2.0", path = "." }

@@ -120,6 +120,23 @@ fn write_archive(files: &[FileEntry], output_path: &Path) -> Result<(), ArchiveE
   Ok(())
 }
 
+/// Bundle a directory to be embedded in the binary.
+/// This function must be called in a build script.
+///
+/// The directory path must be a subdirectory of the manifest directory. The name of the bundle
+/// must later be used as an argument to the `include_fs!` macro.
+///
+/// # Example
+///
+/// ```rust
+/// // In build.rs
+/// include_fs::bundle("assets", "assets").unwrap();
+/// include_fs::bundle("./static/public", "public").unwrap();
+///
+/// // In main.rs
+/// static ASSETS: IncludeFs = include_fs!("assets");
+/// static PUBLIC: IncludeFs = include_fs!("public");
+/// ```
 pub fn bundle<P: AsRef<Path>>(dir: P, bundle_name: &str) -> Result<(), ArchiveError> {
   let manifest_dir = env::var("CARGO_MANIFEST_DIR").expect("no CARGO_MANIFEST_DIR");
   let source_dir = Path::new(&manifest_dir).join(dir).canonicalize()?;
@@ -152,30 +169,39 @@ pub fn bundle<P: AsRef<Path>>(dir: P, bundle_name: &str) -> Result<(), ArchiveEr
   write_archive(&files, &output_path)
 }
 
-pub struct FsEntry {
-  pub path: String,
-  pub size: u64,
+struct FsEntry {
+  size: u64,
   data_offset: u64,
 }
 
 impl FsEntry {
-  pub fn new(path: String, size: u64, data_offset: u64) -> Self {
-    Self {
-      path,
-      size,
-      data_offset,
-    }
+  fn new(size: u64, data_offset: u64) -> Self {
+    Self { size, data_offset }
   }
 }
 
+/// A lazy-loaded file system embedded in the binary.
+///
+/// The index will be parsed the first time it is accessed. Since only filenames are read on initialization, this should be very fast.
+/// To make sure the index is not read in a time-critical path, the lock can be manually initialized beforehand:
+///
+/// ```rust
+/// static ASSETS: IncludeFs = include_fs!("assets");
+///
+/// // This will block until the index fs is loaded.
+/// let _ = &*ASSETS;
+/// ```
 pub type IncludeFs = LazyLock<IncludeFsInner>;
 
 pub struct IncludeFsInner {
-  pub file_index: HashMap<String, FsEntry>,
-  pub archive_bytes: &'static [u8],
+  file_index: HashMap<String, FsEntry>,
+  archive_bytes: &'static [u8],
 }
 
 impl IncludeFsInner {
+  /// Initialize a new IncludeFs from the given bytes.
+  ///
+  /// This function is only meant to be called by the `include_fs!` macro.
   pub fn new(archive_bytes: &'static [u8]) -> Result<Self, FsError> {
     if &archive_bytes[0..4] != MAGIC {
       return Err(FsError::InvalidArchive);
@@ -223,7 +249,7 @@ impl IncludeFsInner {
       ]);
       offset += 8;
 
-      file_index.insert(path.clone(), FsEntry::new(path, size, data_offset));
+      file_index.insert(path, FsEntry::new(size, data_offset));
     }
 
     Ok(IncludeFsInner {

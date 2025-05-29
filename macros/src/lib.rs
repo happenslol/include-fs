@@ -1,5 +1,19 @@
 use quote::quote;
 
+/// Include a bundled directory in the binary.
+/// To use this macro, include a matching call to `include_fs::bundle` in your build script.
+///
+/// # Example
+///
+/// ```rust
+/// // In build.rs
+/// include_fs::bundle("assets", "assets").unwrap();
+/// include_fs::bundle("./static/public", "public").unwrap();
+///
+/// // In main.rs
+/// static ASSETS: IncludeFs = include_fs!("assets");
+/// static PUBLIC: IncludeFs = include_fs!("public");
+/// ```
 #[proc_macro]
 pub fn include_fs(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
   let input = syn::parse_macro_input!(input as syn::LitStr);
