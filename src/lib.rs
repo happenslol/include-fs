@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 use thiserror::Error;
 use walkdir::WalkDir;
 
-pub use macros::include_fs;
+pub use include_fs_macros::include_fs;
 
 const MAGIC: &[u8; 4] = b"INFS";
 

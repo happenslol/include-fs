@@ -6,14 +6,14 @@ version = 4
 name = "include-fs"
 version = "0.2.0"
 dependencies = [
- "macros",
+ "include-fs-macros",
  "thiserror",
  "walkdir",
 ]
 
 [[package]]
-name = "macros"
-version = "0.0.0"
+name = "include-fs-macros"
+version = "0.2.0"
 dependencies = [
  "proc-macro2",
  "quote",
